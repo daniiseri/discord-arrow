@@ -1,37 +1,7 @@
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
 import appConfig from "../config.json";
-
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing; border-box;
-        list-style: none;
-      }
-
-      body {
-        font-family: 'Open Sans' sans-serif;
-      }
-
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-
-    `}</style>
-  );
-}
+import { useState } from "react";
+import { useRouter } from "next/router";
 
 function Title({ tag, children }) {
   const Tag = tag || "h1";
@@ -51,11 +21,11 @@ function Title({ tag, children }) {
 }
 
 export default function HomePage() {
-  const username = "daniiseri";
+  const [username, setUsername] = useState();
+  const route = useRouter();
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: "flex",
@@ -90,6 +60,10 @@ export default function HomePage() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              route.push(`/chat?username=${username}`);
+            }}
             styleSheet={{
               display: "flex",
               flexDirection: "column",
@@ -114,6 +88,8 @@ export default function HomePage() {
             <TextField
               placeholder="username"
               fullWidth
+              name="username"
+              value={username}
               textFieldColors={{
                 neutral: {
                   textColor: appConfig.theme.colors.neutrals[200],
@@ -122,6 +98,7 @@ export default function HomePage() {
                   backgroundColor: appConfig.theme.colors.neutrals[800],
                 },
               }}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <Button
               type="submit"
