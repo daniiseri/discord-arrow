@@ -12,27 +12,21 @@ const SUPABASE_KEY =
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function listenToInserts(setMessageList) {
+function listen(setMessageList) {
   return supabase
     .channel("any")
     .on(
       "postgres_changes",
       { event: "INSERT", schema: "public", table: "message" },
       (payload) => {
-        setMessageList(payload.new);
+        setMessageList(payload);
       }
     )
-    .subscribe();
-}
-
-function listenToDeletes(setMessageList) {
-  return supabase
-    .channel("any")
     .on(
       "postgres_changes",
       { event: "DELETE", schema: "public", table: "message" },
       (payload) => {
-        setMessageList(payload.old.id);
+        setMessageList(payload);
       }
     )
     .subscribe();
@@ -54,14 +48,14 @@ export default function ChatPage() {
         setMessageList(response.data);
       });
 
-    listenToInserts((newMessage) => {
-      setMessageList((prevState) => [newMessage, ...prevState]);
-    });
-
-    listenToDeletes((oldMessage) => {
-      setMessageList((prevState) => {
-        return prevState.filter((data) => data.id !== oldMessage);
-      });
+    listen((payload) => {
+      payload.eventType === "INSERT"
+        ? setMessageList((prevState) => {
+            return [payload.new, ...prevState];
+          })
+        : setMessageList((prevState) => {
+            return prevState.filter((data) => data.id !== payload.old.id);
+          });
     });
   }, []);
 
