@@ -1,7 +1,7 @@
-import { Box, Button, Text, TextField, Image } from "@skynexui/components";
-import appConfig from "../config.json";
-import { useState } from "react";
+import { Box, Button, Image, Text, TextField } from "@skynexui/components";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import appConfig from "../config.json";
 
 function Title({ tag, children }) {
   const Tag = tag || "h1";

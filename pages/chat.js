@@ -1,16 +1,13 @@
-import { Box, Text, TextField, Image, Button } from "@skynexui/components";
-import { useEffect, useState } from "react";
-import appConfig from "../config.json";
+import { Box, Button, Image, Text, TextField } from "@skynexui/components";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/router";
-import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
+import { useEffect, useState } from "react";
 import { AiOutlineSend } from "react-icons/ai";
+import appConfig from "../config.json";
+import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
+import { env } from '../src/config/env';
 
-const SUPABASE_URL = "https://fucyekeibwaoniehqkii.supabase.co";
-const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1Y3lla2VpYndhb25pZWhxa2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODA5OTYyOTIsImV4cCI6MTk5NjU3MjI5Mn0.d-ceEiVpzkqVP1f81OJziM9XbPdiPxIEVaGxmRBiCeE";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
 
 function listen(setMessageList) {
   return supabase
@@ -45,17 +42,18 @@ export default function ChatPage() {
       .select("*")
       .order("id", { ascending: false })
       .then((response) => {
-        setMessageList(response.data);
+        if (response.data)
+          setMessageList(response.data);
       });
 
     listen((payload) => {
       payload.eventType === "INSERT"
         ? setMessageList((prevState) => {
-            return [payload.new, ...prevState];
-          })
+          return [payload.new, ...prevState];
+        })
         : setMessageList((prevState) => {
-            return prevState.filter((data) => data.id !== payload.old.id);
-          });
+          return prevState.filter((data) => data.id !== payload.old.id);
+        });
     });
   }, []);
 
@@ -69,7 +67,7 @@ export default function ChatPage() {
     supabase
       .from("message")
       .insert([info])
-      .then(() => {});
+      .then(() => { });
 
     setMessage("");
   }
@@ -272,13 +270,13 @@ function MessageList(props) {
               )}
             </Box>
             <Text
-              onMouseEnter={() => {}}
+              onMouseEnter={() => { }}
               onClick={() => {
                 supabase
                   .from("message")
                   .delete()
                   .eq("id", message.id)
-                  .then(() => {});
+                  .then(() => { });
               }}
             >
               Remover
